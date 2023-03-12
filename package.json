@@ -1,6 +1,6 @@
 {
-  "name": "react-native-youtube",
-  "version": "2.0.2",
+  "name": "groundup-rn-youtube",
+  "version": "2.0.1",
   "description": "A <YouTube/> component for React Native.",
   "main": "main.js",
   "types": "main.d.ts",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidohayon669/react-native-youtube.git"
+    "url": "git+https://github.com/rathoddeepak/groundup-rn-youtube.git"
   },
   "keywords": [
     "youtube",
@@ -19,9 +19,9 @@
   "author": "Param Aggarwal",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/davidohayon669/react-native-youtube/issues"
+    "url": "https://github.com/rathoddeepak/groundup-rn-youtube/issues"
   },
-  "homepage": "https://github.com/davidohayon669/react-native-youtube",
+  "homepage": "https://github.com/rathoddeepak/groundup-rn-youtube/blob/android-iframe-youtube/README.md",
   "dependencies": {
     "prop-types": "^15.5.0"
   },
