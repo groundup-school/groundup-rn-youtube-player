@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactNative, {
-  View,
-  ViewPropTypes,
+  View,  
   Text,
   StyleSheet,
   requireNativeComponent,
@@ -38,7 +37,7 @@ export default class YouTube extends React.Component {
     onChangeState: PropTypes.func,
     onChangeQuality: PropTypes.func,
     onChangeFullscreen: PropTypes.func,
-    style: ViewPropTypes.style,
+    style: PropTypes.object,
   };
 
   static defaultProps = {
