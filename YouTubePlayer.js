@@ -171,7 +171,7 @@ export default class YouTubePlayer extends Component {
 				this.watchSeconds = 0;
 			}
 
-			if(progress > 90 && this.props?.onCompleted && !this.completed){
+			if(progress > (this.props?.markAsCompleteAfterPercent || 90) && this.props?.onCompleted && !this.completed){
 				this.completed = true;
 				this.props?.onCompleted();
 			}
