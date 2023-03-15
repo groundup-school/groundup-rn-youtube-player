@@ -167,13 +167,17 @@ export default class YouTubePlayer extends Component {
 			formattedTime
 		}, () => {
 			if(this.watchSeconds >= (this.props?.notifyAfterSeconds || 60)){				
-				this.props?.onWatchedSeconds(this.watchSeconds);
+				this.props?.onWatchedSeconds(currentTime, this.watchSeconds);
 				this.watchSeconds = 0;
 			}
 
 			if(progress > (this.props?.markAsCompleteAfterPercent || 90) && this.props?.onCompleted && !this.completed){
 				this.completed = true;
-				this.props?.onCompleted();
+				this.props?.onCompleted({
+					progress,
+					currentTime,
+					totalDuration
+				});
 			}
 		});
 	}
