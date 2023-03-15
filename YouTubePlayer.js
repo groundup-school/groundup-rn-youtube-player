@@ -44,6 +44,12 @@ export default class YouTubePlayer extends Component {
 		this.completed = false;
 	}
 
+	componentDidMount() {
+		if(this.props?.play)this.setState({
+			isPlaying: true
+		})
+	}
+
 	componentDidUpdate(prevProps) {
 		//Typical usage, don't forget to compare the props
 		if (this.props.play !== prevProps.play) {
