@@ -183,6 +183,10 @@ export default class YouTubePlayer extends Component {
 		if(!totalDuration || !isReady)this.setState({ progress: 0 });
 		const seconds = Math.round((progress / 100) * totalDuration);
 		this.currentPlayer.seekTo(seconds);
+		const formattedTime = `${timeFormat(seconds)} / ${timeFormat(totalDuration)}`;
+		this.setState({
+			formattedTime
+		})
 	}
 
 	render() {
@@ -200,7 +204,7 @@ export default class YouTubePlayer extends Component {
 					play={isPlaying}
 					controls={isFullScreen ? 2 : 0}
 					fullscreen={isFullScreen}
-					loop={false}
+					loop={true}
 					onChangeFullscreen={(e) => {
 						this.setState({ isFullScreen: e.isFullscreen });
 					}}
