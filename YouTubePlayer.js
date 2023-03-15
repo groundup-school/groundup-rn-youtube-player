@@ -136,13 +136,16 @@ export default class YouTubePlayer extends Component {
 	};
 
 	setFullscreen = () => {
-		this.setState({
-			isFullScreen: true,
-		});
+		if(this.props?.onFullScreenPress){
+			this.props.onFullScreenPress();
+		}else{
+			this.setState({
+				isFullScreen: true,
+			});
+		}	
 	};
 
 	handleStateChange = ({ state }) => {
-		console.log("Current Video State: ", state);
 		if (state === "playing") {
 			this.startListener();
 		} else {
