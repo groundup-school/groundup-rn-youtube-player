@@ -106,7 +106,7 @@ export default class YouTubePlayer extends Component {
 	};
 
 	playNext = () => {
-		if (this.props?.onPlayPrevious) this.props?.onPlayNext();
+		if (this.props?.onPlayNext) this.props?.onPlayNext();
 	};
 
 	playPause = () => {
