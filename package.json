@@ -1,6 +1,6 @@
 {
   "name": "groundup-rn-youtube-player",
-  "version": "2.0.10",
+  "version": "2.0.13",
   "description": "A <YouTube/> component for React Native.",
   "main": "main.js",
   "types": "main.d.ts",

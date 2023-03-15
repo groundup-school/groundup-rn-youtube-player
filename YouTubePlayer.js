@@ -167,13 +167,18 @@ export default class YouTubePlayer extends Component {
 		this.watchSeconds++;
 		let progress = (currentTime / totalDuration) * 100;
 		let lastProgress = this.state.lastProgress;
-		const formattedTime = `${timeFormat(currentTime)} / ${timeFormat(totalDuration)}`;
+		const _currentTime = timeFormat(currentTime);
+		const formattedTime = `${_currentTime} / ${timeFormat(totalDuration)}`;
 		this.setState({
 			progress,
 			formattedTime
 		}, () => {
 			if(this.watchSeconds >= (this.props?.notifyAfterSeconds || 60)){				
-				this.props?.onWatchedSeconds(currentTime, this.watchSeconds);
+				this.props?.onWatchedSeconds({
+					currentTime, 
+					currentTimeString: _currentTime,
+					watchedSeconds: this.watchSeconds
+				});
 				this.watchSeconds = 0;
 			}
 
@@ -301,11 +306,13 @@ const style = {
 		fontWeight: 'bold'
 	},
 	options: {
+		marginTop: 10,
 		width: "100%",
 		height: 80,
 		justifyContent: "center"
 	},
 	controls: {
+		top: 5,
 		width: "100%",
 		flexDirection: "row",
 		alignItems: "center",
@@ -319,12 +326,12 @@ const style = {
 	},
 	icon: {
 		resizeMode: "contain",
-		width: 20,
-		height: 20,
+		width: 17,
+		height: 17,
 	},
 	fullScreenButton: {
 		position: "absolute",
-		width: 50,
+		width: 29,
 		height: 50,
 		justifyContent: "center",
 		right: 0,
