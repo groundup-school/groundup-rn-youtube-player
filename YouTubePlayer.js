@@ -1,13 +1,17 @@
 import React, { Component } from "react";
-import { View, Image, TouchableOpacity, Text } from "react-native";
+import { View, Image, TouchableOpacity, Text, Dimensions } from "react-native";
 import YouTube from "./YouTube";
 import SeekBar from "./SeekBar";
 
+const { width, height } = Dimensions.get("window")
 const pauseIcon = require("./images/pause.png");
 const playIcon = require("./images/play.png");
 const previousIcon = require("./images/previous.png");
 const nextIcon = require("./images/next.png");
 const fullscreenIcon = require("./images/fullscreen.png");
+
+const heightedWidth = height > width ? height - 160 : width - 160;
+const normalWidth = width < height ? width - 40 : height - 40;
 
 const timeFormat = (duration) => {  
   const hrs = ~~(duration / 3600);
@@ -25,10 +29,26 @@ const timeFormat = (duration) => {
   return ret;
 }
 
+const formatDuration = (d) => {
+    if(typeof d != 'string')return '00:00:00';
+    let maxLength = 8;
+    let rmlength = maxLength - d.length;
+    let ap = '';
+    for(let i = 1; i <= rmlength; i++){
+        if(i%3 === 0){
+            ap += `:`;
+        }else{
+            ap += `0`;
+        }
+    }
+    return ap + d;
+}
+
 export default class YouTubePlayer extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			onReadyProgress: false,
 			currentTime: 0,
 			totalDuration: 0,
 
@@ -62,6 +82,7 @@ export default class YouTubePlayer extends Component {
 				totalDuration: 0,
 				isReady: false,
 				formattedTime: '',
+				onReadyProgress: false
 			}, () => {
 				this.watchSeconds = 0;
 				this.completed = false;
@@ -97,7 +118,7 @@ export default class YouTubePlayer extends Component {
 			() => {
 				this.setTime();
 				if (this.props?.onReady) {
-					this.props.onReady(e);
+					this.props.onReady(e);					
 				}
 			}
 		);
@@ -151,6 +172,9 @@ export default class YouTubePlayer extends Component {
 		} else {
 			this.stopListener();
 		}
+		this.setState({
+			isPlaying: (state !== "stopped" && state !== "paused")
+		})
 	};
 
 	setTime = async () => {
@@ -176,10 +200,18 @@ export default class YouTubePlayer extends Component {
 			progress,
 			formattedTime
 		}, () => {
+			if(this.state.onReadyProgress){
+				let p = this.state.onReadyProgress
+				this.setState({
+					onReadyProgress: false
+				}, () => {
+					this.seekBarTo(p);
+				}) 
+			}
 			if(this.watchSeconds >= (this.props?.notifyAfterSeconds || 60)){				
 				this.props?.onWatchedSeconds({
 					currentTime, 
-					currentTimeString: _currentTime,
+					currentTimeString: formatDuration(_currentTime),
 					watchedSeconds: this.watchSeconds
 				});
 				this.watchSeconds = 0;
@@ -196,15 +228,28 @@ export default class YouTubePlayer extends Component {
 		});
 	}
 
-	seekBarTo = (progress) => {
+	seekBarTo = (progress, callback = false) => {
 		const { totalDuration, isReady } = this.state;
 		if(!totalDuration || !isReady)this.setState({ progress: 0 });
 		const seconds = Math.round((progress / 100) * totalDuration);
 		this.currentPlayer.seekTo(seconds);
-		const formattedTime = `${timeFormat(seconds)} / ${timeFormat(totalDuration)}`;
+		const fseconds = timeFormat(seconds);
+		const formattedTime = `${fseconds} / ${timeFormat(totalDuration)}`;
 		this.setState({
 			formattedTime
+		}, () => {
+			if(this.props?.onSeek){
+				this.props?.onSeek(
+					formatDuration(fseconds)
+				);
+			}
 		})
+	}
+
+	attachProgressOnReady = (onReadyProgress = 0) => {
+		this.setState({
+			onReadyProgress
+		});
 	}
 
 	render() {
@@ -213,14 +258,15 @@ export default class YouTubePlayer extends Component {
 			tintColor = "white",
 			progressBackgroundColor = "#FFFFFF",
 			progressColor = "#FE0002",
-			timeStyle			
+			timeStyle,
+			fullscreen = false
 		} = this.props;
 		return (
 			<View style={this.props.style}>
 				<YouTube
 					{...this.props}
 					play={isPlaying}
-					controls={isFullScreen ? 2 : 0}
+					controls={0}
 					fullscreen={isFullScreen}
 					loop={true}
 					onChangeFullscreen={(e) => {
@@ -231,9 +277,21 @@ export default class YouTubePlayer extends Component {
 					ref={(ref) => (this.currentPlayer = ref)}
 					style={{ alignSelf: "stretch", height: "100%" }}
 				/>
-				<View style={style.options}>
-					<SeekBar
-						style={{ marginTop: 5, paddingHorizontal: 10 }}
+
+				{fullscreen ?
+				<View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
+					  <TouchableOpacity
+							onPress={this.playPause}
+							style={[style.button, { width: 30, height: 30}]}
+						>
+							<Image
+								source={isPlaying ? pauseIcon : playIcon}
+								tintColor={tintColor}
+								style={style.icon}
+							/>
+						</TouchableOpacity>
+						<SeekBar
+						style={{ marginTop: 5, paddingHorizontal: 10, width: heightedWidth }}
 						min={0}
 						max={100}
 						progress={progress}
@@ -244,7 +302,27 @@ export default class YouTubePlayer extends Component {
 						thumbColor={progressColor}
 						thumbColorPressed={progressColor}
 						onProgressChanged={(progress) =>
-							this.seekBarTo(progress)
+							this.seekBarTo(progress, true)
+						}
+					/>
+						<Text style={[style.formattedTime2, { color: tintColor, width: 80 }, timeStyle]}>
+							{formattedTime}
+						</Text>
+				</View>
+				: <View style={style.options}>
+					<SeekBar
+						style={{ marginTop: 5, paddingHorizontal: 10, width: normalWidth }}
+						min={0}
+						max={100}
+						progress={progress}
+						progressHeight={4}
+						progressBackgroundColor={progressBackgroundColor}
+						progressColor={progressColor}
+						thumbSize={10}
+						thumbColor={progressColor}
+						thumbColorPressed={progressColor}
+						onProgressChanged={(progress) =>
+							this.seekBarTo(progress, true)
 						}
 					/>
 
@@ -294,7 +372,7 @@ export default class YouTubePlayer extends Component {
 							/>
 						</TouchableOpacity>
 					</View>
-				</View>
+				</View>}
 			</View>
 		);
 	}
@@ -306,6 +384,10 @@ const style = {
 		position: 'absolute',
 		left: 10,
 		top: 23,
+		fontWeight: 'bold'
+	},
+	formattedTime2: {
+		fontSize: 13,
 		fontWeight: 'bold'
 	},
 	options: {

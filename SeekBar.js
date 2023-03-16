@@ -61,6 +61,8 @@ export default class SeekBar extends Component {
     }
 
     render() {
+        const width = this.state.progressPosition - this.progressLeft;
+        const left = this.state.progressPosition - this.props.thumbSize / 2;
         return (
             <View style={[this.styles.container, this.props.style]}
                   onLayout={(e) => {
@@ -83,7 +85,7 @@ export default class SeekBar extends Component {
                 >
                     <View style={[this.styles.innerProgressCompleted,
                         {
-                            width: this.state.progressPosition - this.progressLeft,
+                            width: Number.isNaN(width) ? 0 : width,
                             backgroundColor: this.props.progressColor || this.styles.innerProgressCompleted.backgroundColor
                         }
                     ]}/>
@@ -92,7 +94,7 @@ export default class SeekBar extends Component {
 
                 <View style={[this.styles.progressThumb,
                     {
-                        left: this.state.progressPosition - this.props.thumbSize / 2,
+                        left: Number.isNaN(left) ? 0 : left,
                         backgroundColor: this.state.isPressed ? this.props.thumbColorPressed : this.props.thumbColor,
                     }]}
                 />
